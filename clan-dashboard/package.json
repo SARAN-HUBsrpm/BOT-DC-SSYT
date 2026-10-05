@@ -1,0 +1,16 @@
+{
+  "name": "clan-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "main": "bot/index.js",
+  "scripts": {
+    "bot": "node bot/index.js",
+    "deploy": "node bot/deploy-commands.js",
+    "web": "node scripts/serve.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
+    "discord.js": "^14.27.0",
+    "dotenv": "^18.0.5"
+  }
+}
