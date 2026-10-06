@@ -1,6 +1,6 @@
 const { Events } = require('discord.js');
 const { syncGuild, printRoles } = require('../services/discordSync');
-const { refreshLinkedRoblox } = require('../services/robloxLink');
+const { runRobloxRefreshNow, startAutomation } = require('../services/automation');
 
 module.exports = {
   name: Events.ClientReady,
@@ -27,8 +27,10 @@ module.exports = {
       console.error('✗ Sync ล้มเหลว:', err.message);
     }
 
+    startAutomation(guild);
+
     // รีเฟรช Roblox เบื้องหลัง (ไม่บล็อกการทำงานของบอท)
-    refreshLinkedRoblox()
+    runRobloxRefreshNow()
       .then((r) => console.log(`✓ Roblox: เชื่อมไว้ ${r.linked} คน (อัปเดต ${r.updated}, ไม่สำเร็จ ${r.failed})`))
       .catch((err) => console.error('✗ รีเฟรช Roblox ล้มเหลว:', err.message));
   },

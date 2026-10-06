@@ -22,7 +22,7 @@
 
     root.innerHTML = `
       <section class="hero">
-        <div class="hero-logo">${logo ? `<img src="${esc(logo)}" alt="">` : '⚔️'}</div>
+        <div class="hero-logo">${logo ? UI.protectedBg(logo, 'hero-logo-img', name) : '⚔️'}</div>
         <h1 class="title-neon">${esc(name)}</h1>
         <p class="sub">${esc((clan && clan.description) || 'Clan Community')}</p>
         <div class="socials">${socialLinks(clan)}</div>

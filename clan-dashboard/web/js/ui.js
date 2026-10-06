@@ -19,6 +19,12 @@
   function safeUrl(u) {
     try { const x = new URL(u); return x.protocol === 'https:' ? x.href : ''; } catch { return ''; }
   }
+  function protectedBg(url, cls, label = '') {
+    const src = safeUrl(url);
+    if (!src) return '';
+    const title = label ? ` aria-label="${esc(label)}"` : '';
+    return `<span class="protected-media ${esc(cls)}" role="img"${title} style="background-image:url('${esc(src)}')"></span>`;
+  }
   const initial = (n) => esc((Array.from(String(n || '?').trim())[0] || '?').toUpperCase());
 
   function categoryInfo(slug) {
@@ -41,7 +47,7 @@
     const st = statusOf(status);
     return `<div class="avatar ${cls}">
       <span class="ph">${initial(name)}</span>
-      ${src ? `<img src="${esc(src)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}
+      ${src ? protectedBg(src, 'avatar-img', name) : ''}
       <i class="status-dot ${st.cls}" title="${st.label}"></i>
     </div>`;
   }
@@ -101,7 +107,7 @@
     return `<div class="mc-panel mc-roblox">
       <span class="mc-label">Roblox</span>
       <div class="rb-row">
-        ${showHead ? `<img class="rb-head" src="${esc(head)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}
+        ${showHead ? protectedBg(head, 'rb-head', 'Roblox avatar') : ''}
         <div class="rb-info">
           <div class="rb-name">${esc(m.roblox_display_name || m.roblox_username || 'Roblox')}${
             m.roblox_verified ? '<span class="rb-ver" title="ยืนยันบัญชีแล้ว">✔</span>' : ''
@@ -111,7 +117,7 @@
           }</div>
           ${stats.length ? `<div class="rb-stats">${stats.join(' • ')}</div>` : ''}
         </div>
-        ${body ? `<img class="rb-figure" src="${esc(body)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}
+        ${body ? protectedBg(body, 'rb-figure', 'Roblox character') : ''}
       </div>
     </div>`;
   }
@@ -157,7 +163,7 @@
         if (!c) return;
         document.getElementById('brandName').textContent = c.clan_name;
         const logo = safeUrl(c.logo_url);
-        if (logo) document.getElementById('brandLogo').innerHTML = `<img src="${esc(logo)}" alt="">`;
+        if (logo) document.getElementById('brandLogo').innerHTML = protectedBg(logo, 'brand-logo-img', c.clan_name);
         document.title = `${c.clan_name} | ${document.title.split('|').pop().trim()}`;
       }).catch(() => {});
     }
@@ -173,9 +179,16 @@
     if (e.target && e.target.tagName === 'IMG') e.target.remove();
   }, true);
 
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target.closest('.protected-media, .cover, .pf-banner')) e.preventDefault();
+  });
+  document.addEventListener('dragstart', (e) => {
+    if (e.target.closest('.protected-media, .cover, .pf-banner')) e.preventDefault();
+  });
+
   window.UI = {
     esc, safeUrl, statusOf, categoryInfo, computeStats, avatar, statusPill, badge, badgesFor,
     memberCard, discordPanel, robloxPanel, skeletonCards, showError, formatDate,
-    renderNav, renderFooter, displayName, CATEGORIES,
+    renderNav, renderFooter, displayName, protectedBg, CATEGORIES,
   };
 })();

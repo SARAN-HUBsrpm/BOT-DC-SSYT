@@ -2,6 +2,7 @@ require('dotenv').config();
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
+const { shutdownBot } = require('./services/automation');
 
 if (!process.env.DISCORD_TOKEN || !process.env.GUILD_ID) {
   console.error('✗ ขาด DISCORD_TOKEN หรือ GUILD_ID ใน .env');
@@ -26,8 +27,15 @@ for (const file of fs.readdirSync(commandsPath).filter((f) => f.endsWith('.js'))
 const eventsPath = path.join(__dirname, 'events');
 for (const file of fs.readdirSync(eventsPath).filter((f) => f.endsWith('.js'))) {
   const event = require(path.join(eventsPath, file));
-  if (event.once) client.once(event.name, (...args) => event.execute(...args));
-  else client.on(event.name, (...args) => event.execute(...args));
+  const handler = async (...args) => {
+    try {
+      await event.execute(...args);
+    } catch (err) {
+      console.error(`Error ใน event ${event.name}:`, err);
+    }
+  };
+  if (event.once) client.once(event.name, handler);
+  else client.on(event.name, handler);
 }
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -54,5 +62,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } catch { /* ignore */ }
   }
 });
+
+process.once('SIGINT', () => shutdownBot(client, 'SIGINT'));
+process.once('SIGTERM', () => shutdownBot(client, 'SIGTERM'));
 
 client.login(process.env.DISCORD_TOKEN);

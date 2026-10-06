@@ -20,7 +20,7 @@
     root.innerHTML = `
       <div class="cover" ${cover ? `style="background-image:url('${esc(cover)}')"` : ''}></div>
       <div class="clan-head">
-        <div class="hero-logo">${logo ? `<img src="${esc(logo)}" alt="">` : '⚔️'}</div>
+        <div class="hero-logo">${logo ? UI.protectedBg(logo, 'hero-logo-img', name) : '⚔️'}</div>
         <div>
           <h1 class="title-neon" style="font-size:clamp(28px,5vw,44px)">${esc(name)}</h1>
           <p class="sub">${esc((clan && clan.description) || 'Clan Community')}</p>
